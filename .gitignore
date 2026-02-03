@@ -1,0 +1,17 @@
+# Virtual environment
+.venv/
+venv/
+
+# Python cache
+__pycache__/
+.pytest_cache/
+
+# Audio files
+data/*.wav
+*.wav
+
+# AI models (DO NOT UPLOAD)
+models/
+
+# OS junk
+.DS_Store
