@@ -8,6 +8,8 @@ This project implements a local speech-to-text system using the Vosk model.
 - Prints transcription to terminal
 - Appends transcription to a text file
 - Includes automated tests with pytest
+- Sprint 1 ready for submission.
+
 
 ## Setup
 ```bash
