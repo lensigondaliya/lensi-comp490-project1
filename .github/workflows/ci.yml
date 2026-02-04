@@ -20,7 +20,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pytest vosk ruff
+          pip install pytest vosk ruff scipy
 
       - name: Run linter (ruff)
         run: |
