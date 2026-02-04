@@ -6,11 +6,13 @@ venv/
 __pycache__/
 .pytest_cache/
 
-# Audio files
-data/*.wav
+# Audio files (ignore all)
 *.wav
 
-# AI models (DO NOT UPLOAD)
+# But allow the ONE test audio file used in CI
+!data/voice4.wav
+
+# AI models
 models/
 
 # OS junk
