@@ -1,16 +1,27 @@
-# COMP490 Sprint 1 – Local Speech-to-Text
+# COMP490 Project 1 – Sprint 2
+Meeting Room REST Client
 
-This project implements a local speech-to-text system using the Vosk model.
+This project implements Python client functions (“AI skills”) that interact with the Room Booking REST API server.
+
+---
 
 ## Features
-- Records microphone audio
-- Converts WAV audio to text locally (offline)
-- Prints transcription to terminal
-- Appends transcription to a text file
-- Includes automated tests with pytest
-- Sprint 1 ready for submission.
 
+- Login to API and retrieve JWT token
+- List all available meeting rooms
+- Get available rooms within a time window
+- Book a meeting room
+- List current reservations
+- Cancel a reservation
+- Automated tests using pytest
+- GitHub Actions CI (lint + tests)
+
+---
 
 ## Setup
+
+### 1. Clone repository
+
 ```bash
-pip install -r requirements.txt
+git clone https://github.com/YOUR_USERNAME/YOUR_REPO.git
+cd YOUR_REPO
