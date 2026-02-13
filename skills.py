@@ -56,10 +56,11 @@ def login(email: str, password: str) -> Dict[str, Any]:
     return data
 
 
-# 2) LIST ALL ROOMS (handy, and counts as an endpoint)
+# 2) LIST ALL ROOMS 
 def list_rooms(token: str) -> List[Dict[str, Any]]:
     _require_base_url()
-    url = f"{BASE_URL}/api/v1/meeting-rooms/"
+    url = f"{BASE_URL}/api/v1/meeting-rooms/available/"
+
     headers = _auth_headers(token)
 
     resp = requests.get(url, headers=headers, timeout=20)
@@ -90,7 +91,7 @@ def get_available_rooms(token: str, start_time: Optional[str] = None, end_time: 
     if end_time:
         payload["end_time"] = end_time
 
-    # 1) Try GET with JSON body (matches “sent in json”)
+    # 1) Try GET with JSON body
     resp = requests.get(url, headers=headers, json=payload if payload else None, timeout=20)
     print("AVAILABLE ROOMS STATUS:", resp.status_code)
     if not resp.ok:
@@ -105,7 +106,7 @@ def get_available_rooms(token: str, start_time: Optional[str] = None, end_time: 
     if isinstance(data, dict) and "results" in data and isinstance(data["results"], list):
         return data["results"]
 
-    # Some APIs return {"rooms":[...]}
+    # Some APIs return 
     if isinstance(data, dict) and "rooms" in data and isinstance(data["rooms"], list):
         return data["rooms"]
 
