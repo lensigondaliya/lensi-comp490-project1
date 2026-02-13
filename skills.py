@@ -1,7 +1,7 @@
 import os
+import requests
 from typing import Any, Dict, List, Optional, Union
 
-import requests
 
 # Expect: export SERVER_URL="http://198.74.62.248:4567"
 BASE_URL = (os.getenv("SERVER_URL") or "").rstrip("/")
@@ -78,8 +78,6 @@ def list_rooms(token: str) -> List[Dict[str, Any]]:
 
 
 # 3) GET AVAILABLE ROOMS
-from typing import Optional, Dict, List, Any
-import requests
 
 def get_available_rooms(token: str, start_time: Optional[str] = None, end_time: Optional[str] = None) -> List[Any]:
     _require_base_url()
