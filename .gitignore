@@ -1,19 +1,50 @@
-# Virtual environment
+
+# Virtual environments
+
 .venv/
 venv/
+env/
 
-# Python cache
+
+# Python cache / compiled files
+
 __pycache__/
+*.pyc
+*.pyo
+*.pyd
 .pytest_cache/
 
-# Audio files (ignore all)
+
+# OS files
+
+.DS_Store
+Thumbs.db
+
+
+# IDE settings
+
+.vscode/
+.idea/
+
+
+# Audio files (ignore all by default)
+
 *.wav
+*.mp3
+*.m4a
 
-# But allow the ONE test audio file used in CI
-!data/voice4.wav
 
-# AI models
+# Data & model folders (ignore all)
+
+data/
 models/
 
-# OS junk
-.DS_Store
+
+# Allow ONLY the CI test audio file
+
+!data/voice4.wav
+
+
+# Secrets / environment files
+.env
+.env.*
