@@ -68,10 +68,10 @@ pip install -r requirements.txt
 Create a file named `.env` in the project root directory:
 
 ```env
-OPENAI_API_KEY=your_openai_api_key_here
-SERVER_URL=http://your-server-url
-EMAIL=your_email
-PASSWORD=your_password
+OPENAI_API_KEY=openai_api_key_here
+SERVER_URL=http://server-url
+EMAIL=email
+PASSWORD=password
 ```
 
 ### Variable Explanation
