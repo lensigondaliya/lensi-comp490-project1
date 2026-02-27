@@ -1,2 +1,13 @@
-requests
-pytest
+langchain==0.2.10
+langchain-core==0.2.15
+langchain-openai==0.1.10
+openai==2.23.0
+
+vosk==0.3.44
+sounddevice==0.5.5
+scipy==1.17.0
+
+pytest==9.0.2
+python-dotenv==1.2.1
+requests==2.32.5
+PyYAML==6.0.3
