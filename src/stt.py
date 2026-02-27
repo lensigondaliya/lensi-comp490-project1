@@ -1,12 +1,11 @@
 import json
 import wave
 from pathlib import Path
-
-import logging
-logging.getLogger("vosk").setLevel(logging.ERROR)
-
+import sounddevice as sd
 
 from scipy.io.wavfile import write as wav_write
+from vosk import Model, KaldiRecognizer
+
 
 # Path to local Vosk model
 MODEL_PATH = Path("models/vosk-model-small-en-us-0.15")
@@ -17,7 +16,7 @@ def record_microphone_to_wav(
     duration: int = 5,
     sample_rate: int = 16000
 ) -> None:
-    import sounddevice as sd
+
 
     print("Recording... Speak now.")
     audio = sd.rec(
@@ -35,7 +34,7 @@ def convert_wav_to_text(wav_file: str) -> str:
     """
     Convert a WAV audio file into text using a local Vosk model.
     """
-    from vosk import Model, KaldiRecognizer
+
 
     wf = wave.open(wav_file, "rb")
 
