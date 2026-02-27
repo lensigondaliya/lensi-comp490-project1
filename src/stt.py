@@ -2,6 +2,10 @@ import json
 import wave
 from pathlib import Path
 
+import logging
+logging.getLogger("vosk").setLevel(logging.ERROR)
+
+
 from scipy.io.wavfile import write as wav_write
 
 # Path to local Vosk model
@@ -34,6 +38,9 @@ def convert_wav_to_text(wav_file: str) -> str:
     from vosk import Model, KaldiRecognizer
 
     wf = wave.open(wav_file, "rb")
+
+    if wf.getnchannels() != 1:
+        raise ValueError("WAV must be mono (1 channel).")
 
     model = Model(str(MODEL_PATH))
     recognizer = KaldiRecognizer(model, wf.getframerate())

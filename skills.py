@@ -1,88 +1,129 @@
 import os
-import requests
+from datetime import datetime
 from typing import Any, Dict, List, Optional, Union
 
+import requests
 
-# Expect: export SERVER_URL="http://198.74.62.248:4567"
-BASE_URL = (os.getenv("SERVER_URL") or "").rstrip("/")
+def _require_base_url() -> str:
+    """
+    Construct authorization headers for authenticated API requests.
+
+    Args:
+        token: JWT access token.
+
+    Returns:
+        Dictionary containing Authorization header.
+    """
+    base = os.getenv("SERVER_URL") or os.getenv("BASE_URL") or os.getenv("SERVER")
+    if not base:
+        raise RuntimeError("Missing SERVER_URL in environment (.env).")
+    return base.rstrip("/")
 
 
-def _require_base_url() -> None:
-    if not BASE_URL:
-        raise ValueError("SERVER_URL is not set. In terminal: export SERVER_URL='http://IP:PORT'")
+def _short(text: str, limit: int = 400) -> str:
+    text = text or ""
+    return text if len(text) <= limit else text[:limit] + "..."
 
 
 def _auth_headers(token: str) -> Dict[str, str]:
     return {"Authorization": f"Bearer {token}"}
 
 
-def _short(text: str, n: int = 300) -> str:
-    if text is None:
-        return ""
-    text = str(text)
-    return text[:n] + ("..." if len(text) > n else "")
-
-
 def _extract_access_token(login_json: Any) -> str:
     """
-    Be flexible: API responses sometimes look like:
-      {"access": "..."} OR {"token": {"access": "..."}} OR {"tokens": {"access": "..."}}
+    Extract the access token from the login response.
+    Supports different possible response formats returned by the API.
     """
     if isinstance(login_json, dict):
         if isinstance(login_json.get("access"), str):
             return login_json["access"]
 
-        for k in ("token", "tokens", "data"):
-            val = login_json.get(k)
-            if isinstance(val, dict) and isinstance(val.get("access"), str):
-                return val["access"]
+        tok = login_json.get("token")
+        if isinstance(tok, str):
+            return tok
+        if isinstance(tok, dict) and isinstance(tok.get("access"), str):
+            return tok["access"]
+
+     
+        if isinstance(tok, dict) and isinstance(tok.get("token"), dict):
+            inner = tok.get("token")
+            if isinstance(inner.get("access"), str):
+                return inner["access"]
+
+        data = login_json.get("data")
+        if isinstance(data, dict) and isinstance(data.get("access"), str):
+            return data["access"]
 
     raise ValueError(f"No access token found in login response: {login_json}")
 
 
-# 1) LOGIN
+def current_datetime() -> Dict[str, Any]:
+    """
+    Return current local date/time info (useful for interpreting 'today', 'tomorrow', etc.)
+    """
+    now = datetime.now()
+    return {
+        "iso": now.isoformat(timespec="seconds"),
+        "weekday": now.strftime("%A"),
+        "date": now.strftime("%Y-%m-%d"),
+        "time": now.strftime("%H:%M:%S"),
+    }
+
+
 def login(email: str, password: str) -> Dict[str, Any]:
-    _require_base_url()
-    url = f"{BASE_URL}/api/v1/member/login/"
+    """Authenticate the user and return the login response JSON."""
+    base = _require_base_url()
+    url = f"{base}/api/v1/member/login/"
     payload = {"email": email, "password": password}
 
     resp = requests.post(url, json=payload, timeout=20)
-    print("LOGIN STATUS:", resp.status_code)
-    if not resp.ok:
-        print("LOGIN ERROR:", _short(resp.text))
-
     resp.raise_for_status()
-    data = resp.json()
-    return data
+    return resp.json()
 
 
-# 2) LIST ALL ROOMS 
+def login_access_token(email: str, password: str) -> str:
+    """Log in and return JWT access token."""
+    data = login(email, password)
+    return _extract_access_token(data)
+
+
 def list_rooms(token: str) -> List[Dict[str, Any]]:
-    _require_base_url()
-    url = f"{BASE_URL}/api/v1/meeting-rooms/available/"
+    """
+    Retrieve a list of all meeting rooms available on the server.
 
-    headers = _auth_headers(token)
+    Args:
+        token: JWT access token for authentication.
 
-    resp = requests.get(url, headers=headers, timeout=20)
+    Returns:
+        A list of room dictionaries as returned by the API.
+    """
+    base = _require_base_url()
+    url = f"{base}/api/v1/meeting-rooms/"
+    resp = requests.get(url, headers=_auth_headers(token), timeout=20)
     print("LIST ROOMS STATUS:", resp.status_code)
     if not resp.ok:
         print("LIST ROOMS ERROR:", _short(resp.text))
-
     resp.raise_for_status()
     data = resp.json()
-    # Usually list, but some APIs wrap it
-    if isinstance(data, dict) and "results" in data and isinstance(data["results"], list):
-        return data["results"]
+
+    
     if isinstance(data, list):
         return data
+    if isinstance(data, dict) and isinstance(data.get("results"), list):
+        return data["results"]
     return [data]
 
 
-# 3) GET AVAILABLE ROOMS
-
-def get_available_rooms(token: str, start_time: Optional[str] = None, end_time: Optional[str] = None) -> List[Any]:
-    _require_base_url()
-    url = f"{BASE_URL}/api/v1/meeting-rooms/available/"
+def get_available_rooms(
+    token: str,
+    start_time: Optional[str] = None,
+    end_time: Optional[str] = None,
+) -> List[Dict[str, Any]]:
+    """
+    Get available rooms for a time window.
+    """
+    base = _require_base_url()
+    url = f"{base}/api/v1/meeting-rooms/available/"
     headers = _auth_headers(token)
 
     payload: Dict[str, str] = {}
@@ -91,30 +132,32 @@ def get_available_rooms(token: str, start_time: Optional[str] = None, end_time: 
     if end_time:
         payload["end_time"] = end_time
 
-    # 1) Try GET with JSON body
     resp = requests.get(url, headers=headers, json=payload if payload else None, timeout=20)
     print("AVAILABLE ROOMS STATUS:", resp.status_code)
     if not resp.ok:
         print("AVAILABLE ROOMS ERROR:", _short(resp.text))
     resp.raise_for_status()
-
     data = resp.json()
 
-    # Normalize output to a list
     if isinstance(data, list):
         return data
-    if isinstance(data, dict) and "results" in data and isinstance(data["results"], list):
+    if isinstance(data, dict) and isinstance(data.get("results"), list):
         return data["results"]
-
-    # Some APIs return 
-    if isinstance(data, dict) and "rooms" in data and isinstance(data["rooms"], list):
-        return data["rooms"]
-
-    return []
+    return [data]
 
 
+def get_my_bookings(token: str) -> Union[List[Dict[str, Any]], Dict[str, Any]]:
+    """Fetch all bookings for the authenticated user."""
+    base = _require_base_url()
+    url = f"{base}/api/v1/meeting-rooms/my-bookings/"
+    resp = requests.get(url, headers=_auth_headers(token), timeout=20)
+    print("MY BOOKINGS STATUS:", resp.status_code)
+    if not resp.ok:
+        print("MY BOOKINGS ERROR:", _short(resp.text))
+    resp.raise_for_status()
+    return resp.json()
 
-# 4) BOOK ROOM
+
 def book_room(
     token: str,
     room_id: int,
@@ -123,51 +166,33 @@ def book_room(
     no_of_persons: int = 1,
 ) -> Dict[str, Any]:
     """
-    IMPORTANT: start_time/end_time must be like: "2026-02-20 10:00 AM"
-    Returns:
-      On success -> {"ok": True, "status": 200/201, "data": <json>}
-      On failure -> {"ok": False, "status": 400/403/404, "error_text": "..."}
+    Book a meeting room for a specified time range.
     """
-    _require_base_url()
-    url = f"{BASE_URL}/api/v1/meeting-rooms/{room_id}/book/"
-    headers = _auth_headers(token)
-    payload = {"start_time": start_time, "end_time": end_time, "no_of_persons": no_of_persons}
+    base = _require_base_url()
+    url = f"{base}/api/v1/meeting-rooms/{room_id}/book/"
 
-    resp = requests.post(url, headers=headers, json=payload, timeout=20)
-    print("BOOK STATUS:", resp.status_code)
+    payload = {
+        "start_time": start_time,
+        "end_time": end_time,
+        "no_of_persons": no_of_persons,
+    }
+
+    resp = requests.post(url, headers=_auth_headers(token), json=payload, timeout=20)
+
     if not resp.ok:
-        print("BOOK ERROR:", _short(resp.text))
         return {"ok": False, "status": resp.status_code, "error_text": resp.text}
 
-    # success
     try:
         return {"ok": True, "status": resp.status_code, "data": resp.json()}
     except Exception:
         return {"ok": True, "status": resp.status_code, "data": resp.text}
 
 
-# 5) LIST MY BOOKINGS  (THIS IS THE ENDPOINT YOU HAD WRONG BEFORE)
-def get_my_bookings(token: str) -> Union[List[Dict[str, Any]], Dict[str, Any]]:
-    _require_base_url()
-    url = f"{BASE_URL}/api/v1/meeting-rooms/my-bookings/"
-    headers = _auth_headers(token)
-
-    resp = requests.get(url, headers=headers, timeout=20)
-    print("MY BOOKINGS STATUS:", resp.status_code)
-    if not resp.ok:
-        print("MY BOOKINGS ERROR:", _short(resp.text))
-
-    resp.raise_for_status()
-    return resp.json()
-
-
-# 6) CANCEL BOOKING
 def cancel_booking(token: str, booking_id: int) -> Dict[str, Any]:
-    _require_base_url()
-    url = f"{BASE_URL}/api/v1/meeting-rooms/{booking_id}/cancel-booking/"
-    headers = _auth_headers(token)
-
-    resp = requests.delete(url, headers=headers, timeout=20)
+    """Cancel a booking by ID."""
+    base = _require_base_url()
+    url = f"{base}/api/v1/meeting-rooms/{booking_id}/cancel-booking/"
+    resp = requests.delete(url, headers=_auth_headers(token), timeout=20)
     print("CANCEL STATUS:", resp.status_code)
     if not resp.ok:
         print("CANCEL ERROR:", _short(resp.text))
@@ -177,9 +202,3 @@ def cancel_booking(token: str, booking_id: int) -> Dict[str, Any]:
         return {"ok": True, "status": resp.status_code, "data": resp.json()}
     except Exception:
         return {"ok": True, "status": resp.status_code, "data": resp.text}
-
-
-# Helper: do login + return access token as a string
-def login_access_token(email: str, password: str) -> str:
-    data = login(email, password)
-    return _extract_access_token(data)
