@@ -1,146 +1,114 @@
-# COMP490 Project – Sprint 3
-## Voice-Enabled AI Meeting Room Agent
+# Room Booking System (Sprint 4)
+
+## Overview
+This project is a Django-based Room Booking System that allows users to:
+- View meeting rooms
+- Create and manage bookings
+- Track booking history
+- Use REST APIs for room operations
+- Access an admin dashboard
 
 ---
 
-## Overview
-
-This project implements a voice-enabled AI agent that interacts with a Meeting Room Booking REST API.
-
-The system combines:
-
-- **Sprint 1:** Voice recording and speech-to-text  
-- **Sprint 2:** REST API client skills  
-- **Sprint 3:** LangChain AI agent integration  
-
-The agent can answer questions such as:
-
-- “When is my next reservation?”
-- “Do I have a booking tomorrow?”
-- “What rooms are free at 11am?”
-- “Do I have a reservation in Room 1 today?”
-
-For Sprint 3, the agent only answers questions about reservations.  
-It does not create or delete reservations interactively (creation/deletion is used only in automated tests).
-
 ## Features
+- Django backend with REST API
+- Admin panel for managing rooms and bookings
+- Booking history tracking
+- Automated testing with GitHub Actions
+- Continuous deployment to DigitalOcean server
 
-- Login to booking server and retrieve JWT token  
-- List current reservations  
-- Get available rooms for a time window  
-- Voice recording and speech-to-text transcription  
-- LangChain agent with tools  
-- End-to-end integration test  
-- GitHub Actions CI support  
+---
 
-## Project Structure
-
-skills.py → API client functions ("AI skills")
-agent.py → LangChain agent entry point
-src/stt.py → Voice recording and transcription
-tests/test_integration.py → End-to-end integration test
-requirements.txt → Python dependencies
-
-## Setup Instructions
+## Local Setup Instructions
 
 ### 1. Clone Repository
-
+```bash
 git clone https://github.com/lensigondaliya/lensi-comp490-project1.git
 cd lensi-comp490-project1
+```
 
 ### 2. Create Virtual Environment
-
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
+python -m venv venv
+source venv/bin/activate   
 ```
 
 ### 3. Install Dependencies
-
 ```bash
 pip install -r requirements.txt
+pip install -r Room_booking_serve/requirements.txt
 ```
 
----
-
-## Environment Configuration (.env File)
-
-Create a file named `.env` in the project root directory:
-
-```env
-OPENAI_API_KEY=openai_api_key_here
-SERVER_URL=http://server-url
-EMAIL=email
-PASSWORD=password
-```
-
-### Variable Explanation
-
-- **SERVER_URL** – Base URL of the booking server
-- **EMAIL** – Login email
-- **PASSWORD** – Login password
-- **OPENAI_API_KEY** – Required for the LangChain AI agent
-
-⚠️ Do NOT commit the `.env` file to GitHub.
-
-## Running the AI Agent
-
-Start the agent:
-
+### 4. Run Migrations
 ```bash
-python agent.py
+cd Room_booking_serve
+python manage.py migrate
 ```
 
-You can:
+### 5. Run Server
+```bash
+python manage.py runserver
+```
 
-- Type a question
-- Type `voice` to record audio input
-- Type `quit` to exit
+Server runs at: http://127.0.0.1:8000/
 
----
+### Deployed Application (Sprint 4)
 
-## Running Tests
+Live server: http://104.236.239.10:8000/
 
-Run all tests:
+## Important URLs
 
+Admin Panel: http://104.236.239.10:8000/admin/
+
+API Endpoints:
+
+/api/v1/member/
+
+/api/v1/meeting-rooms/
+
+## Environment Variables
+
+SERVER_URL=http://104.236.239.10:8000
+EMAIL=user@gmail.com
+USERNAME=user
+PASSWORD=lensi1110
+
+### CI/CD Pipeline
+
+GitHub Actions runs tests automatically on every push
+
+If tests pass, deployment is triggered
+
+The server is updated automatically via SSH
+
+### Running Tests
 ```bash
 pytest
 ```
 
-Run only the integration test:
+### Technologies Used
 
-```bash
-pytest -m integration
-```
+Python
+Django
+Django REST Framework
+SQLite
+GitHub Actions (CI/CD)
+DigitalOcean (Deployment)
 
+
+### 👤 Author
+
+Lensi Gondaliya
+COMP 490 – Spring 2026
 ---
 
-## Integration Test Behavior
+# 🎯 Final checklist 
 
-The Sprint 3 integration test performs:
+✅ Remove backup folder  
+✅ Update README  
+✅ Push final changes  
 
-1. Login  
-2. Find available rooms  
-3. Create reservation  
-4. Verify reservation exists  
-5. Cancel reservation  
-
-This ensures complete end-to-end functionality and proper cleanup.
-
-
-## Notes for Grading
-
-- Python skills include type hints and docstrings
-- Agent uses LangChain tools
-- Integration test creates and deletes reservations
-- Secrets stored in `.env` and excluded from version control
-- CI runs automated tests
-
-## Summary
-
-Sprint 3 integrates:
-
-- Voice input  
-- REST API skills  
-- AI agent tool usage  
-- Automated end-to-end testing  
+```bash
+git add .
+git commit -m "Final submission update"
+git push origin sprint4
