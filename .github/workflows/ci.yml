@@ -53,3 +53,24 @@ jobs:
           cd Room_booking_serve
           export DJANGO_SETTINGS_MODULE=meeting_room_booking.settings
           pytest
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/sprint4' || github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Deploy to DigitalOcean server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            cd /root/lensi-comp490-project1
+            git pull origin sprint4
+            cd Room_booking_serve
+            source venv/bin/activate
+            pip install -r requirements.txt
+            python manage.py migrate
+            pkill -f "manage.py runserver" || true
+            nohup python manage.py runserver 0.0.0.0:8000 > server.log 2>&1 &
