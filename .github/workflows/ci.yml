@@ -20,7 +20,8 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pytest vosk ruff scipy requests
+          pip install -r requirements.txt
+          pip install pytest-django ruff
 
       - name: Download Vosk model
         run: |
