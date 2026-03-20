@@ -14,9 +14,8 @@ os.environ.setdefault(
 
 django.setup()
 
-from apps.booking.utils import remove_room_and_get_affected_users
-
 def remove_room_flow():
+    from apps.booking.utils import remove_room_and_get_affected_users
     room_id = input("Enter Room ID to remove: ")
     try:
         room_id = int(room_id)
