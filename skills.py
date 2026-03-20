@@ -5,19 +5,7 @@ from typing import Any, Dict, List, Optional, Union
 import requests
 
 def _require_base_url() -> str:
-    """
-    Construct authorization headers for authenticated API requests.
-
-    Args:
-        token: JWT access token.
-
-    Returns:
-        Dictionary containing Authorization header.
-    """
-    base = os.getenv("SERVER_URL") or os.getenv("BASE_URL") or os.getenv("SERVER")
-    if not base:
-        raise RuntimeError("Missing SERVER_URL in environment (.env).")
-    return base.rstrip("/")
+    return "http://127.0.0.1:8000"
 
 
 def _short(text: str, limit: int = 400) -> str:

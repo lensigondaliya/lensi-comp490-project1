@@ -1,5 +1,10 @@
 import os
 from datetime import datetime, timedelta
+import django
+from apps.booking.utils import remove_room_and_get_affected_users
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "meeting_room_booking.settings")
+django.setup()
 
 from skills import (
     book_room,
@@ -10,13 +15,10 @@ from skills import (
     cancel_booking,
 )
 
-EMAIL = os.getenv("EMAIL")
-PASSWORD = os.getenv("PASSWORD")
+EMAIL = "test@gmail.com"
+PASSWORD = "123456"
 
-if not EMAIL or not PASSWORD:
-    raise SystemExit("Missing EMAIL or PASSWORD in environment variables.")
-
-# Time format required by server: "YYYY-MM-DD HH:MM AM/PM"
+# Time format required by server: 
 def fmt(dt: datetime) -> str:
     return dt.strftime("%Y-%m-%d %I:%M %p")
 
@@ -26,8 +28,8 @@ def main():
     print("✅ Logged in, token received.\n")
 
     # pick a time window (15 min)
-    now = datetime.now()
-    start_dt = now + timedelta(hours=1)          # 1 hour from now
+    now = datetime.noappw()
+    start_dt = now + timedelta(hours=1)       
     start_dt = start_dt.replace(second=0, microsecond=0)
     end_dt = start_dt + timedelta(minutes=15)
 
@@ -68,5 +70,33 @@ def main():
     else:
         print("⚠️ No bookings found to cancel.")
 
+if users:
+    print("Users whose reservations were canceled:")
+
+    with open("cancellation_report.txt", "w") as f:
+        f.write(f"Room '{room_name}' deleted\n")
+        f.write("Affected users:\n")
+
+        for user in users:
+            print(f"- {user}")
+            f.write(f"- {user}\n")
+
+    print("\nReport saved to cancellation_report.txt")
+
+else:
+    print("No reservations were affected.")
+
+
 if __name__ == "__main__":
-    main()
+    print("\n===== MENU =====")
+    print("1. Run Booking Flow")
+    print("2. Remove Room")
+
+    choice = input("Enter choice: ")
+
+    if choice == "1":
+        main()
+    elif choice == "2":
+        remove_room_flow()
+    else:
+        print("Invalid choice")
