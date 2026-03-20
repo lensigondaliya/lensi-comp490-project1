@@ -66,9 +66,15 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
+            cd /root
+            if [ ! -d "lensi-comp490-project1" ]; then
+              git clone https://github.com/lensigondaliya/lensi-comp490-project1.git
+            fi
             cd /root/lensi-comp490-project1
-            git pull origin sprint4
+            git fetch origin sprint4
+            git reset --hard origin/sprint4
             cd Room_booking_serve
+            python3 -m venv venv || true
             source venv/bin/activate
             pip install -r requirements.txt
             python manage.py migrate
