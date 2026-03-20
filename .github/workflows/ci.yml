@@ -78,7 +78,6 @@ jobs:
             source venv/bin/activate
             pip install -r requirements.txt
             python manage.py migrate
-            pkill -f "manage.py runserver" || true
-            setsid nohup python manage.py runserver 0.0.0.0:8000 > server.log 2>&1 < /dev/null &
+            fuser -k 8000/tcp || true
+            nohup bash -lc 'source venv/bin/activate && python manage.py runserver 0.0.0.0:8000' > server.log 2>&1 < /dev/null &
             sleep 5
-            exit 0
