@@ -1,5 +1,4 @@
 import os
-import django
 
 from datetime import datetime, timedelta
 import pytest
