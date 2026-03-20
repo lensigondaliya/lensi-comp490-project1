@@ -5,8 +5,7 @@ from rest_framework.test import APIClient
 from apps.member.models import CustomUser
 from apps.booking.models import MeetingRoom, BookingHistory
 from django.utils import timezone
-from datetime import timedelta, datetime
-import json
+from datetime import timedelta
 
 class MeetingRoomAPITestCase(TestCase):
     def setUp(self):

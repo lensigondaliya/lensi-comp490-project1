@@ -1,7 +1,6 @@
 import os
 from datetime import datetime, timedelta
 import django
-from apps.booking.utils import remove_room_and_get_affected_users
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "meeting_room_booking.settings")
 django.setup()

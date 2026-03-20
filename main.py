@@ -1,7 +1,6 @@
 import os
 import sys
 import django
-print("STARTING PROGRAM")
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_DIR = os.path.join(BASE_DIR, "Room_booking_serve")
@@ -16,6 +15,7 @@ os.environ.setdefault(
 django.setup()
 
 from apps.booking.utils import remove_room_and_get_affected_users
+
 def remove_room_flow():
     room_id = input("Enter Room ID to remove: ")
     try:
@@ -34,25 +34,33 @@ def remove_room_flow():
 
     if users:
         print("Users whose reservations were canceled:")
+    
+    with open("cancellation_report.txt", "w") as f: 
+        f.write(f"Room '{room_name}' deleted\n") 
+        f.write("Affected users:\n")
+
     for user in users:
         print(f"- {user}")
+        f.write(f"- {user}\n")
+        
+
+        print("\nReport saved to cancellation_report.txt")
+
     else:
         print("No reservations were affected.")
+
+
 def main():
-        print("INSIDE MAIN")
-
-print("\n===== MENU =====")
+    print("\n===== MENU =====")
 print("1. Remove Room")
-
 choice = input("Enter choice: ")
 
 if choice == "1":
-        remove_room_flow()
+    remove_room_flow()
 else:
-        print("Invalid choice")
-
-if __name__ == "__main__":
-    main()  
+    print("Invalid choice")
+if __name__ == "main":
+    main()
 
 # EMAIL = "test@gmail.com"
 # PASSWORD = "123456"

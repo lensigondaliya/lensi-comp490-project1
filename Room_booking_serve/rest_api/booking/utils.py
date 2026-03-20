@@ -68,19 +68,3 @@ def send_cancellation_email(room_name, start_time, end_time, booked_by_email):
         send_mail(subject, message, from_email, [to_email])
     except Exception as e:
         print(f"Error sending cancellation email: {e}")
-
-
-
-
-
-def send_cancellation_email(room_name, start_time, end_time, booked_by_email):
-    subject = 'Meeting Room Booking Cancellation'
-    formatted_start_time = start_time.strftime("%d-%B-%Y %I:%M %p")
-    formatted_end_time = end_time.strftime("%I:%M %p")
-    message = f'Your booking for meeting room {room_name} from {formatted_start_time} to {formatted_end_time} has been canceled.'
-    from_email = settings.DEFAULT_FROM_EMAIL
-    to_email = booked_by_email
-    try:
-        send_mail(subject, message, from_email, [to_email])
-    except Exception as e:
-        print(f"Error sending cancellation email: {e}")
