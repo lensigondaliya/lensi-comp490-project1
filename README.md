@@ -52,11 +52,27 @@ python manage.py runserver
 
 Server runs at: http://127.0.0.1:8000/
 
+### TUI Interface
+
+This project includes a Text User Interface (TUI) that allows users to manage rooms directly from the terminal.
+
+Features:
+Add a room
+Remove a room
+Change room capacity
+Automatically remove reservations when a room is deleted
+Display affected usernames
+Save cancellation report to cancellation_report.txt
+
+### Run TUI (Sprint 4)
+python main.py
+
+
 ### Deployed Application (Sprint 4)
 
 Live server: http://104.236.239.10:8000/
 
-## Important URLs
+### Important URLs
 
 Admin Panel: http://104.236.239.10:8000/admin/
 
@@ -71,7 +87,6 @@ API Endpoints:
 SERVER_URL=http://104.236.239.10:8000
 EMAIL=user@gmail.com
 USERNAME=user
-PASSWORD=lensi1110
 
 ### CI/CD Pipeline
 
@@ -80,6 +95,16 @@ GitHub Actions runs tests automatically on every push
 If tests pass, deployment is triggered
 
 The server is updated automatically via SSH
+
+### Test Coverage
+
+The following tests validate core functionality:
+
+Add Room → verifies room creation
+Remove Room → verifies room deletion and affected users
+Change Capacity → verifies capacity updates
+
+Tests ensure database operations behave correctly rather than just checking outputs.
 
 ### Running Tests
 ```bash
@@ -95,20 +120,34 @@ SQLite
 GitHub Actions (CI/CD)
 DigitalOcean (Deployment)
 
+### Separation of Concerns
 
-### 👤 Author
+The project follows the requirement to separate interface from database logic:
+
+main.py → handles user input (TUI interface)
+apps/booking/utils.py → handles database operations:
+add room
+remove room
+change capacity
+
+
+# Author
 
 Lensi Gondaliya
 COMP 490 – Spring 2026
 ---
 
-# 🎯 Final checklist 
+# Final Checklist
 
-✅ Remove backup folder  
-✅ Update README  
-✅ Push final changes  
+- TUI interface implemented  
+- Add room functionality working  
+- Remove room and reservation cleanup working  
+- Cancellation report saved to file  
+- Change room capacity working  
+- Interface separated from database logic  
+- README updated  
+- Final changes pushed to GitHub  
 
-```bash
-git add .
-git commit -m "Final submission update"
-git push origin sprint4
+## Submission
+
+The final version of the project has been pushed to the `sprint4` branch on GitHub.
