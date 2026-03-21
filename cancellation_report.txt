@@ -1,1 +1,2 @@
-Users whose reservations were canceled:
+Room 'DMF 471' deleted
+Affected users:
